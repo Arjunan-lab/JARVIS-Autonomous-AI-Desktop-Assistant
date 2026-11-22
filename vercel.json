@@ -1,0 +1,47 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "jarvis-api": {
+      "root": "backend",
+      "framework": "fastapi"
+    },
+    "desktop-web": {
+      "root": "desktop",
+      "framework": "vite",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "jarvis-api",
+          "format": "url",
+          "env": "JARVIS_API_URL"
+        }
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "jarvis-api"
+      }
+    },
+    {
+      "source": "/docs",
+      "destination": {
+        "service": "jarvis-api"
+      }
+    },
+    {
+      "source": "/openapi.json",
+      "destination": {
+        "service": "jarvis-api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "desktop-web"
+      }
+    }
+  ]
+}
