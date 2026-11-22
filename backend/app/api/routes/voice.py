@@ -1,0 +1,150 @@
+import logging
+from typing import Annotated
+
+import edge_tts
+from fastapi import APIRouter, Depends, Request, WebSocket, status
+from fastapi.responses import Response
+from sqlalchemy.orm import Session
+
+from app.core.config import get_settings
+from app.db.session import get_db
+from app.schemas.voice import (
+    VoiceSessionRequest,
+    VoiceSessionResponse,
+    VoiceSynthesisRequest,
+)
+from app.services.gemini_service import GeminiService
+from app.services.realtime_service import RealtimeVoiceService
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/api/voice", tags=["voice"])
+
+_audio_cache: dict[tuple[str, str, str, str], bytes] = {}
+_TEST_SILENT_MP3 = b"\xff\xfb\x90\x00" + b"\x00" * 32
+
+
+def get_voice_service(request: Request) -> RealtimeVoiceService:
+    """Dependency providing RealtimeVoiceService instance."""
+    settings = getattr(request.app.state, "settings", None) or get_settings()
+    return RealtimeVoiceService(settings=settings)
+
+
+@router.post(
+    "/session",
+    response_model=VoiceSessionResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create short-lived voice session credentials",
+)
+async def create_voice_session(
+    request: Request,
+    service: Annotated[RealtimeVoiceService, Depends(get_voice_service)],
+    db: Annotated[Session, Depends(get_db)],
+    payload: VoiceSessionRequest | None = None,
+) -> VoiceSessionResponse:
+    """Generate ephemeral client credentials for voice communication.
+
+    - When AI_PROVIDER=gemini, initializes a Google Gemini live session.
+    - When AI_PROVIDER=openai, generates an ephemeral WebRTC client secret.
+      If OpenAI returns a rate limit (HTTP 429), quota exhaustion, or any
+      upstream connection failure, smart-switches automatically to Google Gemini Live.
+    Permanent API keys are never exposed to the client.
+    """
+    settings = getattr(request.app.state, "settings", None) or get_settings()
+
+    if settings.effective_ai_provider == "gemini":
+        gemini_svc = GeminiService(settings=settings)
+        return gemini_svc.create_session(payload, db=db)
+
+    try:
+        return await service.create_voice_session(payload, db=db)
+    except Exception as err:
+        # If OpenAI fails (429 rate limit, 401 auth, 404 endpoint, quota) and Gemini is available, smart-switch!
+        if settings.gemini_api_key and len(settings.gemini_api_key.strip()) > 10:
+            err_msg = getattr(err, "message", str(err))
+            logger.warning(
+                "OpenAI voice session creation failed (%s). Smart-switching to Google Gemini Live.",
+                err_msg,
+            )
+            gemini_svc = GeminiService(settings=settings)
+            resp = gemini_svc.create_session(payload, db=db)
+            resp.switched_to_fallback = True
+            resp.fallback_reason = f"OpenAI unavailable ({err_msg}). Switched to Google Gemini Live."
+            return resp
+        raise
+
+
+@router.websocket("/gemini-live")
+async def gemini_live_websocket(
+    websocket: WebSocket,
+    db: Annotated[Session, Depends(get_db)],
+) -> None:
+    """WebSocket streaming bridge connecting the desktop client to Google Gemini Live API."""
+    settings = get_settings()
+    gemini_svc = GeminiService(settings=settings)
+    await gemini_svc.bridge_live_session(websocket, db=db)
+
+
+@router.post(
+    "/synthesize",
+    summary="Synthesize speech with fluent British JARVIS neural voice",
+)
+async def synthesize_speech(
+    payload: VoiceSynthesisRequest,
+    request: Request,
+) -> Response:
+    """Generate high-fidelity British neural speech audio using Microsoft Edge Neural TTS.
+
+    Uses the cultured, fluent, liberal British accent (en-GB-RyanNeural) to match
+    the iconic JARVIS voice persona from the Iron Man cinematic universe.
+    """
+    settings = getattr(request.app.state, "settings", None) or get_settings()
+
+    if settings.app_env in {"test", "staging"}:
+        return Response(
+            content=_TEST_SILENT_MP3,
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": "inline; filename=speech.mp3"},
+        )
+
+    cache_key = (payload.text.strip(), payload.voice, payload.rate, payload.pitch)
+    if cache_key in _audio_cache:
+        return Response(
+            content=_audio_cache[cache_key],
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": "inline; filename=speech.mp3"},
+        )
+
+    try:
+        communicate = edge_tts.Communicate(
+            payload.text,
+            voice=payload.voice,
+            rate=payload.rate,
+            pitch=payload.pitch,
+        )
+        audio_chunks: list[bytes] = []
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_chunks.append(chunk["data"])
+
+        audio_bytes = b"".join(audio_chunks)
+        if not audio_bytes:
+            raise ValueError("No audio data generated by neural synthesizer")
+
+        # Bound cache size to prevent memory leaks
+        if len(_audio_cache) > 100:
+            _audio_cache.clear()
+        _audio_cache[cache_key] = audio_bytes
+
+        return Response(
+            content=audio_bytes,
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": "inline; filename=speech.mp3"},
+        )
+    except Exception as e:  # noqa: BLE001
+        logger.error("Speech synthesis failed: %s", e)
+        return Response(
+            content=b"",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            media_type="text/plain",
+        )

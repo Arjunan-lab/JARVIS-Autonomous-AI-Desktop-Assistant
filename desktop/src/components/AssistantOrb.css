@@ -1,0 +1,274 @@
+/* ===================================================================
+   AssistantOrb — Minimal Cinematic Neural Geodesic Interface
+   =================================================================== */
+
+.orb-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  gap: 14px;
+  padding: 8px;
+  transition: transform 0.2s ease-out;
+}
+
+.orb-wrapper:focus-visible {
+  outline: 1px solid #FF3038;
+  outline-offset: 8px;
+  border-radius: 50%;
+}
+
+.orb-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orb-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* ── HUD Orbital Hairline Framework ───────────────────────────────── */
+
+.hud-tick {
+  stroke: #FF3038;
+  stroke-width: 1;
+  opacity: 0.7;
+}
+
+.hud-ring-outer {
+  fill: none;
+  stroke: rgba(255, 48, 56, 0.16);
+  stroke-width: 0.75;
+}
+
+.hud-ring-mid {
+  fill: none;
+  stroke: rgba(255, 48, 56, 0.24);
+  stroke-width: 0.75;
+}
+
+.hud-arc-right {
+  fill: none;
+  stroke: #FF3038;
+  stroke-width: 1.25;
+  opacity: 0.85;
+}
+
+.hud-accent-dot {
+  fill: #FF3038;
+  filter: drop-shadow(0 0 4px #FF3038);
+}
+
+.orb-wave-outer {
+  fill: none;
+  stroke: #FF3038;
+  stroke-width: 1.25;
+  stroke-dasharray: 4 4;
+  transition: r 0.1s ease-out, opacity 0.1s ease-out;
+}
+
+/* ── Neural Geodesic Edges ────────────────────────────────────────── */
+
+.neural-edge {
+  stroke: #FF3038;
+  stroke-linecap: round;
+  transition: opacity 0.1s ease-out;
+}
+
+.neural-edge.back {
+  stroke-width: 0.65;
+  stroke: #78151B;
+}
+
+.neural-edge.front {
+  stroke-width: 0.95;
+  stroke: #FF3038;
+}
+
+/* ── Neural Nodes ─────────────────────────────────────────────────── */
+
+.neural-node {
+  fill: #FF3038;
+  transition: r 0.12s ease-out, opacity 0.12s ease-out;
+}
+
+.neural-node.node-front {
+  fill: #FFFFFF;
+  stroke: #FF3038;
+  stroke-width: 0.75;
+}
+
+.neural-node.node-back {
+  fill: #78151B;
+}
+
+/* ── Central Singularity Core ─────────────────────────────────────── */
+
+.neural-core {
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 16px rgba(255, 48, 56, 0.85));
+  animation: core-breathe 4s ease-in-out infinite;
+}
+
+.neural-singularity-center {
+  filter: drop-shadow(0 0 6px #FFFFFF) drop-shadow(0 0 14px #FF3038);
+}
+
+/* ── Typography Below Orb ─────────────────────────────────────────── */
+
+.orb-typography {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  margin-top: 6px;
+}
+
+.orb-wordmark {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.52em;
+  color: #EDEDEF;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.12);
+}
+
+.orb-context-status {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: #85858D;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ===================================================================
+   State Modulations
+   =================================================================== */
+
+/* ── Listening State ──────────────────────────────────────────────── */
+.state-listening .neural-core {
+  animation: core-fast-pulse 1.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(255, 48, 56, 0.95));
+}
+
+.state-listening .neural-node.node-front {
+  fill: #FFFFFF;
+  filter: drop-shadow(0 0 6px rgba(255, 48, 56, 0.8));
+}
+
+.state-listening .orb-context-status {
+  color: #FF3038;
+  text-shadow: 0 0 10px rgba(255, 48, 56, 0.4);
+}
+
+/* ── Thinking State ───────────────────────────────────────────────── */
+.state-thinking .neural-edge.front {
+  stroke-dasharray: 6 3;
+  animation: edge-pulse 1s linear infinite;
+}
+
+.state-thinking .neural-core {
+  animation: core-fast-pulse 0.9s ease-in-out infinite;
+}
+
+.state-thinking .orb-context-status {
+  color: #EDEDEF;
+}
+
+/* ── Speaking State ───────────────────────────────────────────────── */
+.state-speaking .neural-core {
+  filter: drop-shadow(0 0 28px rgba(255, 48, 56, 1));
+}
+
+.state-speaking .orb-context-status {
+  color: #EDEDEF;
+}
+
+/* ── Error State ──────────────────────────────────────────────────── */
+.state-error .neural-core {
+  fill: #78151B;
+  filter: drop-shadow(0 0 12px rgba(120, 21, 27, 0.6));
+}
+
+.state-error .neural-edge {
+  stroke: #78151B !important;
+}
+
+.state-error .neural-node {
+  fill: #78151B !important;
+}
+
+.state-error .orb-context-status {
+  color: #FF3038;
+}
+
+/* ── Disconnected State ───────────────────────────────────────────── */
+.state-disconnected .neural-core {
+  opacity: 0.35;
+  filter: none;
+}
+
+.state-disconnected .neural-edge {
+  opacity: 0.15 !important;
+  stroke: #404048;
+}
+
+.state-disconnected .neural-node {
+  opacity: 0.25 !important;
+  fill: #404048;
+}
+
+.state-disconnected .orb-wordmark {
+  color: #606068;
+}
+
+.state-disconnected .orb-context-status {
+  color: #404048;
+}
+
+/* ===================================================================
+   Keyframes
+   =================================================================== */
+
+@keyframes core-breathe {
+  0%, 100% {
+    opacity: 0.88;
+    transform: scale(1);
+    transform-origin: center;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+    transform-origin: center;
+  }
+}
+
+@keyframes core-fast-pulse {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(0.96);
+    transform-origin: center;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.14);
+    transform-origin: center;
+  }
+}
+
+@keyframes edge-pulse {
+  to {
+    stroke-dashoffset: -18;
+  }
+}

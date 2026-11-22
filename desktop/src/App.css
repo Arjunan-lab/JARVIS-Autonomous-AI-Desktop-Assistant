@@ -1,0 +1,890 @@
+/* ===================================================================
+   JARVIS — Minimal Cinematic Neural Interface
+   Exact 1:1 Reference Match:
+     Pure Black:        #030303
+     Secondary Surface: #0A0A0C
+     Hairline Borders:  #202024
+     Neural Red:        #FF3038
+     Deep Red:          #78151B
+     Primary Silver:    #EDEDEF
+     Secondary Muted:   #85858D
+   =================================================================== */
+
+.jarvis-app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background-color: #030303;
+  color: #EDEDEF;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+}
+
+/* ── Top Bar ──────────────────────────────────────────────────────── */
+
+.jarvis-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 24px 0 16px;
+  background: #030303;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-reactor-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+.topbar-brand {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  color: #EDEDEF;
+  text-transform: uppercase;
+}
+
+.topbar-accent-line {
+  width: 48px;
+  height: 1px;
+  background: #FF3038;
+  opacity: 0.55;
+  margin-left: 10px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.system-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  color: #EDEDEF;
+  text-transform: uppercase;
+}
+
+.system-status-indicator .status-dot {
+  width: 5.5px;
+  height: 5.5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.system-status-indicator .status-dot.online {
+  background: #FF3038;
+  box-shadow: 0 0 6px #FF3038;
+}
+
+.system-status-indicator .status-dot.loading {
+  background: #EAB308;
+  box-shadow: 0 0 6px #EAB308;
+}
+
+.system-status-indicator .status-dot.offline {
+  background: #78151B;
+}
+
+.system-status-indicator .status-label {
+  color: #EDEDEF;
+  font-weight: 500;
+}
+
+.system-status-indicator .status-meta {
+  color: #85858D;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.topbar-clock {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #85858D;
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 10px;
+}
+
+.window-btn {
+  background: transparent;
+  border: none;
+  color: #707078;
+  font-size: 11.5px;
+  cursor: pointer;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.window-btn:hover {
+  color: #EDEDEF;
+}
+
+.window-btn.close:hover {
+  color: #FF3038;
+}
+
+/* ── App Body: Rail + Stage ───────────────────────────────────────── */
+
+.jarvis-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── Left Navigation Rail ─────────────────────────────────────────── */
+
+.jarvis-rail {
+  width: 56px;
+  background: #030303;
+  border-right: 1px solid rgba(255, 255, 255, 0.035);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 0 16px 0;
+  flex-shrink: 0;
+  z-index: 15;
+}
+
+.rail-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rail-item {
+  position: relative;
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #55555F;
+  cursor: pointer;
+  transition: color 0.18s ease;
+  padding: 0;
+}
+
+.rail-item:hover {
+  color: #EDEDEF;
+}
+
+.rail-item.active {
+  color: #EDEDEF;
+}
+
+/* Active vertical red indicator on far left edge matching reference photo */
+.rail-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: #FF3038;
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 10px rgba(255, 48, 56, 0.7);
+}
+
+.rail-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Accessible text kept for screen readers & tests */
+.rail-label-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.rail-badge {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FF3038;
+  box-shadow: 0 0 4px #FF3038;
+}
+
+.rail-footer {
+  display: flex;
+  justify-content: center;
+}
+
+.menu-trigger {
+  color: #55555F;
+}
+
+.menu-trigger:hover {
+  color: #EDEDEF;
+}
+
+/* ── Main Stage Area ──────────────────────────────────────────────── */
+
+.jarvis-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #030303;
+  overflow: hidden;
+}
+
+/* ── Home Screen (Cinematic Centerpiece) ───────────────────────────── */
+
+.cinematic-home {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40px 40px 40px;
+  background: radial-gradient(circle at 50% 48%, rgba(26, 4, 7, 0.45) 0%, rgba(3, 3, 3, 0) 65%);
+}
+
+/* ── Floating HUD Telemetry Card (Right) ──────────────────────────── */
+
+.hud-telemetry-card {
+  position: absolute;
+  top: 36%;
+  right: 17%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  pointer-events: none;
+  animation: fade-in 1s ease;
+  transition: opacity 0.6s ease;
+}
+
+.hud-telemetry-card.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.telemetry-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  font-weight: 500;
+  color: #85858D;
+  text-transform: uppercase;
+}
+
+.telemetry-dot {
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.telemetry-dot.red {
+  background: #FF3038;
+  box-shadow: 0 0 6px #FF3038;
+}
+
+.telemetry-dot.dim {
+  background: #404048;
+}
+
+.telemetry-row.active .telemetry-label {
+  color: #C0C0C8;
+}
+
+/* ── Center Neural Orb Area & Cinematic Shift ──────────────────────── */
+
+.neural-core-centerpiece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: -30px;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* Smooth glide from center to left (~35% horizontal center, scale ~88%) */
+.neural-core-centerpiece.chat-active {
+  transform: translateX(min(-240px, -18vw)) scale(0.88);
+}
+
+/* ── Translucent Right-Side HUD Chat Panel (Matching Reference Image) ── */
+
+.cinematic-chat-panel {
+  position: absolute;
+  top: 40px;
+  right: 48px;
+  bottom: 104px;
+  width: min(560px, 46vw);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateX(36px);
+  pointer-events: none;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.cinematic-chat-panel.visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* ── Bottom Controls Bar ──────────────────────────────────────────── */
+
+.bottom-controls-bar {
+  position: absolute;
+  bottom: 34px;
+  left: 44px;
+  right: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Left: Voice Mode Capsule */
+.voice-mode-capsule {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 22px;
+  background: rgba(10, 10, 12, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 205px;
+}
+
+.voice-mode-capsule:hover {
+  border-color: rgba(255, 48, 56, 0.45);
+  background: rgba(18, 12, 14, 0.85);
+}
+
+.voice-mode-capsule.active {
+  border-color: #FF3038;
+  background: rgba(255, 48, 56, 0.1);
+  box-shadow: 0 0 14px rgba(255, 48, 56, 0.25);
+}
+
+.capsule-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF3038;
+  box-shadow: 0 0 6px #FF3038;
+  flex-shrink: 0;
+}
+
+.capsule-texts {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 1.5px;
+}
+
+.capsule-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #EDEDEF;
+  letter-spacing: 0.04em;
+}
+
+.capsule-sub {
+  font-size: 9.5px;
+  color: #85858D;
+  letter-spacing: 0.02em;
+}
+
+.capsule-arrow {
+  margin-left: auto;
+  color: #606068;
+}
+
+/* Center: Circular Mic Button with Audio Ticks */
+.center-orb-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.cinematic-voice-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #030303;
+  border: 1px solid #FF3038;
+  color: #EDEDEF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(255, 48, 56, 0.32), inset 0 0 12px rgba(255, 48, 56, 0.12);
+  transition: all 0.25s ease;
+}
+
+.cinematic-voice-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 26px rgba(255, 48, 56, 0.5), inset 0 0 16px rgba(255, 48, 56, 0.22);
+}
+
+.cinematic-voice-btn.active {
+  border-color: #FF3038;
+  background: rgba(255, 48, 56, 0.15);
+  box-shadow: 0 0 28px rgba(255, 48, 56, 0.65), inset 0 0 20px rgba(255, 48, 56, 0.4);
+  animation: pulse-ring 2s infinite ease-out;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 18px rgba(255, 48, 56, 0.32); }
+  50% { box-shadow: 0 0 34px rgba(255, 48, 56, 0.65); }
+  100% { box-shadow: 0 0 18px rgba(255, 48, 56, 0.32); }
+}
+
+/* Horizontal Waveform meters flanking center mic */
+.audio-wave-flank {
+  position: absolute;
+  top: 27px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.audio-wave-flank.left {
+  right: 68px;
+}
+
+.audio-wave-flank.right {
+  left: 68px;
+}
+
+.wave-tick-line {
+  width: 14px;
+  height: 1px;
+  background: #35353C;
+}
+
+.wave-tick-dot {
+  width: 2.5px;
+  height: 2.5px;
+  border-radius: 50%;
+  background: #55555E;
+}
+
+.voice-btn-caption {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: #85858D;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Right: Minimal Composer Pill */
+.composer-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.composer-container.chat-open {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+}
+
+.minimal-composer-pill {
+  display: flex;
+  align-items: center;
+  width: 240px;
+  background: rgba(10, 10, 12, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 8px 14px 8px 18px;
+  transition: border-color 0.2s ease;
+}
+
+.minimal-composer-pill:focus-within {
+  border-color: rgba(255, 48, 56, 0.5);
+  background: rgba(18, 12, 14, 0.85);
+}
+
+.composer-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #EDEDEF;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  outline: none;
+}
+
+.composer-input::placeholder {
+  color: #606068;
+}
+
+.composer-send-btn {
+  background: transparent;
+  border: none;
+  color: #65656E;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  transition: color 0.15s ease;
+}
+
+.composer-send-btn:hover:not(:disabled) {
+  color: #FF3038;
+}
+
+.composer-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Visually hidden label to satisfy test contracts */
+.log-label-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Bottom Right Watermark matching reference photo */
+.cinematic-watermark {
+  position: absolute;
+  bottom: 14px;
+  right: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.watermark-label {
+  font-size: 8.5px;
+  letter-spacing: 0.28em;
+  color: #404048;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.watermark-accent {
+  width: 32px;
+  height: 1.5px;
+  background: #FF3038;
+  opacity: 0.85;
+}
+
+/* ── Conversation Log Drawer ──────────────────────────────────────── */
+
+.conversation-drawer {
+  position: absolute;
+  bottom: 88px;
+  right: 32px;
+  width: 440px;
+  height: 520px;
+  background: rgba(10, 10, 12, 0.96);
+  border: 1px solid #202024;
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 1px rgba(255, 48, 56, 0.3);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  backdrop-filter: blur(16px);
+  animation: slide-up 0.25s ease-out;
+  overflow: hidden;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #202024;
+  background: #060608;
+}
+
+.drawer-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #FF3038;
+  text-transform: uppercase;
+}
+
+.drawer-close {
+  background: transparent;
+  border: none;
+  color: #85858D;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer-close:hover {
+  color: #EDEDEF;
+}
+
+.drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Subviews Container (Tasks, Memory, Approvals, Settings, etc.) ─── */
+
+.subview-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 24px 32px;
+  overflow-y: auto;
+  background: #030303;
+}
+
+.subview-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  margin-bottom: 24px;
+}
+
+.subview-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #EDEDEF;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.subview-content {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Architecture View ────────────────────────────────────────────── */
+
+.architecture-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.architecture-header {
+  padding: 20px;
+  background: #0A0A0C;
+  border: 1px solid #202024;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stage-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #FF3038;
+}
+
+.stage-desc {
+  font-size: 12px;
+  color: #85858D;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.architecture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 18px;
+  background: #0A0A0C;
+  border: 1px solid #202024;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(255, 48, 56, 0.4);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #202024;
+  padding-bottom: 10px;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #EDEDEF;
+}
+
+.card-badge {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+.card-badge.active {
+  background: rgba(255, 48, 56, 0.12);
+  color: #FF3038;
+  border: 1px solid rgba(255, 48, 56, 0.3);
+}
+
+.card-badge.ready {
+  background: rgba(133, 133, 141, 0.15);
+  color: #EDEDEF;
+  border: 1px solid #202024;
+}
+
+.card-body {
+  font-size: 11.5px;
+  color: #85858D;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Error Banner ─────────────────────────────────────────────────── */
+
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: 12px 24px 0 24px;
+  background: rgba(120, 21, 27, 0.25);
+  border: 1px solid rgba(255, 48, 56, 0.35);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #FF3038;
+}
+
+.alert-banner .alert-dismiss {
+  margin-left: auto;
+  padding: 3px 8px;
+  background: rgba(255, 48, 56, 0.2);
+  border: 1px solid rgba(255, 48, 56, 0.4);
+  border-radius: 3px;
+  color: #FF3038;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+/* ── Responsive adjustments ───────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+  .neural-core-centerpiece.chat-active {
+    transform: translateX(-16vw) scale(0.84);
+  }
+  .cinematic-chat-panel {
+    width: min(480px, 48vw);
+    right: 28px;
+  }
+}
+
+@media (max-width: 860px) {
+  .hud-telemetry-card {
+    display: none;
+  }
+  .neural-core-centerpiece.chat-active {
+    transform: translateY(-20vh) scale(0.68);
+  }
+  .cinematic-chat-panel {
+    top: auto;
+    bottom: 96px;
+    left: 20px;
+    right: 20px;
+    width: auto;
+    height: 52vh;
+    transform: translateY(24px);
+  }
+  .cinematic-chat-panel.visible {
+    transform: translateY(0);
+  }
+  .bottom-controls-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+}

@@ -1,0 +1,175 @@
+/* ===================================================================
+   CurvedChatHud — Holographic Cinematic HUD Chat Display
+   Zero Background · Curved Arch Perspective · Typewriting Animation · 5s Auto-Vanish
+   =================================================================== */
+
+.curved-hud-overlay {
+  position: absolute;
+  top: 72%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 680px;
+  pointer-events: none;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.curved-hud-overlay.fade-in {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  filter: blur(0px);
+  animation: hud-emerge 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.curved-hud-overlay.fade-out {
+  opacity: 0;
+  transform: translate(-50%, -58%) scale(0.96);
+  filter: blur(8px);
+}
+
+@keyframes hud-emerge {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -44%) scale(0.96);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.curved-hud-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  /* Absolutely zero background */
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  /* Cinematic curved perspective */
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+/* ── Top and Bottom Curved Arc Hairlines ─────────────────────────── */
+
+.hud-arc-top,
+.hud-arc-bottom {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hud-curve-svg {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  display: block;
+}
+
+/* ── Floating Message Content (Zero Background) ─────────────────── */
+
+.hud-message-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 6px 24px;
+  max-width: 600px;
+  /* Absolutely zero background */
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: rotateX(5deg);
+}
+
+.hud-sender-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  user-select: none;
+}
+
+.sender-indicator-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FF3038;
+  box-shadow: 0 0 8px #FF3038;
+}
+
+.sender-name {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: #FF3038;
+  text-transform: uppercase;
+}
+
+.hud-session-mark {
+  font-family: monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  color: #606068;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
+/* ── Typewritten Text Body ───────────────────────────────────────── */
+
+.hud-text-body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14.5px;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  color: #EDEDEF;
+  max-width: 580px;
+  word-break: break-word;
+}
+
+.sender-jarvis .hud-typewritten-text {
+  color: #FFFFFF;
+  text-shadow: 0 0 16px rgba(255, 48, 56, 0.4), 0 0 24px rgba(255, 255, 255, 0.2);
+}
+
+.sender-user .hud-typewritten-text {
+  color: #D4D4D8;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+}
+
+/* ── Blinking Holographic Cursor ─────────────────────────────────── */
+
+.hud-cursor-pulse {
+  display: inline-block;
+  margin-left: 2px;
+  color: #FF3038;
+  font-weight: 700;
+  text-shadow: 0 0 8px #FF3038;
+  animation: cursor-blink 0.8s infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
